@@ -1,0 +1,30 @@
+Build hijau. Ringkasan Batch #2 (Prioritas 1 — POS page):
+
+File diubah:
+- `src/features/pos/pos-page.tsx`
+- `src/features/pos/product-grid.tsx`
+
+Cakupan per kategori (halaman POS):
+
+| Kategori | Perubahan |
+|---|---|
+| 1. Skeleton | `GridSkeleton` (10 kartu, tinggi 220) + placeholder search bar saat `productsQ.isLoading`, di-swap ke `ProductGrid` (fade `page-enter` via mount). `RefetchingBadge` di header grid saat background refetch. |
+| 2. Empty state | Grid produk kosong (`visible.length === 0`) sekarang pakai `<EmptyState>` seragam. Cart kosong sudah bagus dari sebelumnya, dibiarkan. |
+| 3. Error handling | `productsQ.isError` → `<ErrorState>` dengan `friendlyError()` + tombol "Coba lagi" (memicu `productsQ.refetch()`). `onError` toast di `completeSale`/`checkout`/stock-check sudah lengkap sebelumnya. |
+| 4. A11y — icon buttons | `aria-label` naik jadi deskriptif: "Kosongkan seluruh keranjang", "Kurangi/Tambah jumlah {nama produk}", "Hapus {nama} dari keranjang", "Hapus packaging tambahan {nama}". |
+| 4. A11y — `<div onClick>` | Audit selesai: semua interaktif di POS sudah `<button>` asli (grid produk, stepper, kategori pills, hold chips). Tidak ada `<div onClick>` yang perlu diganti. |
+| 4. A11y — aria-live | Grand Total dibungkus `aria-live="polite" aria-atomic="true"` + `<span className="sr-only">` narasi total & qty untuk screen reader. `RefetchingBadge` sudah punya `aria-live` sendiri. |
+| 5. LoadingButton | Tombol "Bayar" (checkout gate) + tombol "Selesaikan/Simpan PO" di payment dialog → `<LoadingButton loading={isCompleting}>` (disabled + spinner + `aria-busy`, cegah double-submit). |
+| 5. ConfirmDialog | (a) Kosongkan keranjang, (b) Hapus item dari keranjang — via `useConfirm()` (Radix `AlertDialog`, focus trap & Escape default). Void transaksi tidak ada di halaman POS ini (transaksi selesai langsung tercatat; void dilakukan di halaman Sales/Pesanan → masuk batch berikutnya). |
+
+Catatan halaman POS yang tidak diubah karena sudah aman:
+- Radix `Dialog`/`Sheet`/`AlertDialog` — focus trap & Escape default, tidak ada override.
+- Semua `<Label htmlFor>` di panel customer/notes/phone sudah dipasangkan dengan `<Input id>` yang benar.
+- Semua tombol icon-only lain (`X` hapus hold, `×` hapus metode pembayaran) sudah `aria-label` deskriptif.
+
+Belum tersentuh (menunggu batch selanjutnya sesuai urutanmu):
+- Prioritas 2: Finance (7 halaman + ledger)
+- Prioritas 3: Sales (home, pesanan, preorder, shifts) — termasuk void transaksi
+- Prioritas 4: accounts, products re-audit, settings
+
+Konfirmasi lanjut ke Prioritas 2 (Finance) atau ada penyesuaian dulu?
